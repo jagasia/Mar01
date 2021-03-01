@@ -1,0 +1,730 @@
+Serialization
+
+	1) Add Employee
+	2) Modify Employee
+	3) Display All Employees
+	4) Find Employee by Id
+	5) Exit
+
+
+employees.dat		(file)
+
+we store ArrayList<Employee> into that file
+
+whenever an employee is added to the arraylist, we can persist that object to the file
+CRUD
+	Create		(an employee. means add employee object to the collection)
+	Read		(i) read all the employees. (ii) read employee by id 
+	Update		(update an employee)
+	Delete		(remove employee from list)
+
+
+Problems we face
+i) difficult to manage the code when it is done all in main method
+ii) if we upgrade the project from "java project" (console) to GUI (or) to a web app (or) mobile application,
+	most of the code we have written were found not reusable
+
+solution
+DAO pattern
+
+iii) the file system is difficult to scale
+	the arraylist is stored in the file. to load entire arraylist as an object in memory leads to scalability issue
+	so file system is not good idea for a project.
+
+solution
+	JDBC and Database back end
+
+
+iv) lot of sql queries we will write in java (jdbc) 
+but they are specific sql language queries for i) oracle (Oracle) 
+ii) sql server (microsoft) iii) mysql iv) db2 (IBM)
+
+solution
+	Hibernate
+
+
+
+
+in java, 
+	package names can be 
+		model			any code that defines data. or access data
+			Employee is a data definition
+			EmployeeDao is data access (Data Access Objects) code for create read update delete
+		view
+			any INPUT/OUTPUT code
+		controller
+			provides access between view and model (servlet will be controller (future) not now)
+	MVC pattern
+
+
+
+Reminder:
+	ListIterator
+
+Reminder:
+	labels:
+
+
+Iterator
+	the iterators are forward only
+	methods are:
+		hasNext()		:boolean
+		next()			:object
+		remove()		:remove the current element
+
+Introducing "ListIterator"
+	as the name implies, it will work only for List category of collection objects
+	Speciality is that the list iterators 
+		can move to previous also.	(next and previous)
+
+	methods are:
+		hasNext()
+		next()
+		remove()
+		hasPrevious()
+		previous()
+
+This is very useful to traverse in both the directions for List collections
+
+	ex:
+			employeeList.iterator();			//returns Iterator
+			employeeList.listIterator();			//returns ListIterator
+
+Labels:
+	In java, there is no "goto" statement. Usually, labels are used to work with "goto" statements. But since java does not have "goto" statement,
+	labels are used to "break" the current or any blocks.
+
+	
+ex:
+		for(int i=0;i<20;i++)
+		{
+			for(int j=0;j<20;j++)
+			{
+				if(condition==true)
+					break;				//this will break only "j" loop
+			}
+		}
+
+
+consider below scenario:
+
+		outer:				//this is a lable
+		for(int i=0;i<20;i++)
+		{
+			inner:
+			for(int j=0;j<20;j++)
+			{
+				if(condition==true)
+					break outer;				//this will break only "j" loop
+			}
+		}
+		//move to here
+
+very useful when using break inside switch case
+
+		for(int i=0;i<20;i++)
+		{
+			for(int j=0;j<20;j++)
+			{
+				switch(x)
+				{
+					case 'a':
+					break;		//this break will not exit any loop. ONLY switch exited
+				}
+
+			}
+		}
+
+	Note: 	use labels here, to give a clarity to break upto which loop
+
+
+
+University
+	List<College>
+
+College
+	University
+
+1 to 1
+1 to Many
+Many to 1
+Many to Many
+
+
+Customer purchase Product		(where to fit purchase info? in Customer??? or in Product???)
+NO neither... create a new Class for Purchase
+
+1 customer can purchase many product		(agreed)
+
+many customer can purchase 1 product		(agreed)
+
+hence
+
+Many to Many
+
+	rule:	If the relationship (purchase) is M-M then the relationship becomes an entity
+
+So now 2 entities having a relationship has become 3 entities totally
+
+So create Purchase as a class
+
+Purchase
+	cid
+	pid
+
+
+Employee 	vs	Department
+Many Employees belong to 1 Department		1 to M
+
+1 will join Many	(rule)
+
+departmentId becomes a part of Employee		
+
+Basically, many cannot be accommodated in an entity
+
+
+------------------------------
+we are going to learn:
+	Serializing different versions of class
+	Transient fields
+
+
+
+imagine we create a class in java 4 version		(old)
+	ie., a class that implements Serializable interface
+
+	we store it in a file
+
+now, we have moved to java 8 version
+	we read that object from file
+	
+
+Exception in thread "main" java.io.InvalidClassException: model.Student; class invalid for deserialization
+
+The above error occurred because of the difference in the java version
+	in which a class was serialize and
+	in which a class was de serialized
+
+
+
+private static final long serialVersionUID = 1L;
+
+between 1.6 and 1.8 
+	version compatibility
+
+1.4 and 1.8
+
+
+Problem is from the objects serialized using old version of java,
+when we deserialize to new version of java, we are getting "InvalidClassException"
+
+This should be solved using "serialVersionUID" 
+
+"Transient"
+	when we serialize an object of a class, NOT ALL THE MEMBERS of the class may be required to serialize
+
+public class Employee implements Serializable{
+	private Integer employeeId;
+	private String firstName;
+	private String lastName;
+	private String department;
+	transient SimpleDateFormat sdf;
+	
+public Employee() {}
+....
+for date format conversion purpose, we may need SimpleDateFormat
+
+but sdf is not required to be serialized.
+similarly, there may be some variables declared globally for internal purpose. They should not be stored in the file.
+
+They can be declared as transient.
+
+transient member of a class does not participate in serialization
+transient means non-persistent
+
+Task:
+	class Student
+		int studentId;
+		String name;
+		int age;			//should be declared as transient
+
+	serialize this object
+	and on de serialize, observe that age is not stored
+
+===========================================================================
+Multi-Threading
+------------------------
+
+So far, we have created lot of programs. We executed them.
+How many threads were present in them?
+	ans:		1
+
+So far we created single threaded processes
+
+here, 2 terms
+	Process
+	Thread
+		are used in above statement.
+Let us understand these terms
+
+What is process?
+
+Notepad is a program.	When i run notepad, it becomes a "process" (according to Microprocessor)
+if i run notepad program simultaneously 5 times, i see 5 processes in my task manager.
+
+THis means every running instance of a program is a "process"
+
+Process (can be defined as) is the running instance of a Program
+
+
+what is a thread?????
+
+In a MS Word document, when i am typing, 
+	i) whatever i type is displayed
+	ii) spelling and grammer is checked
+	iii) some words are auto completed
+	iv) whenever i reach right margin, it is wrapped to next line
+
+so many things happend in one process.
+	Each one of those tasks are performed by a separate Thread
+
+"A process may contain 1 or more Threads"
+
+not 0 or more threads. That means?????? so far we executed many programs.
+	Are they also called as "Process"es?	
+		Yes
+	Did they had atleast 1 thread?
+		Yes
+
+Where was the thread? I did not see it???
+	You saw that. 
+		main method is itself a thread. "Main thread"
+	Ok. What if i did not write a main method???
+		How do you execute a program without main method?	If we do not execute, it is not process.
+
+	We mean, every process has atleast 1 thread.
+
+when we run a program with main method, the execution starts from main method only.
+	so main method is the main thread.
+
+	What is thread
+		light weight process
+
+
+Multi-tasking
+	i) Process based multi-tasking
+	ii) Thread based multi-tasking
+
+
+1) do 2 things using 2 processes
+		CPU allocates resources for each process	(resource means?	time and memory)
+		for 2 task, 2 processes consumes CPU resource separately
+
+2) do 2 things using 2 threades inside 1 process
+		for 1 process, CPU allocated some resource.
+		that resource is shared by both the threads
+
+
+
+
+
+CPU goes for rounds
+	means, he visit every process
+	the time spent by the CPU for every ward
+
+in 1 second, if cpu goes 3* 1024 * 1024 * 1024 rounds across the processes,
+	then we call the CPU as 3 GHz processor
+
+in that round trip, cpu spends the time for each process
+
+
+Thread is a part of the process
+
+advantage of thread:
+	imagine there is only 1 thread in a process.
+	cpu comes and spend a definite time for the process
+		our thread is waiting for user input
+
+Intel VTune performance analyser
+	Tuning advise	:		CPU was mostly idle. consider multi-threading
+			the CPU utilization is 0% most of the time
+
+
+	CPU utilization is 0%		
+
+	----
+	imagine if there are 2 threads in a process
+	1 thread is waiting for user input
+	CPU performs the task of another thread
+	cpu utilization is 50%
+
+
+	3 threads,		2/3		=66%
+
+	4 thread,		3/4		75%
+
+we may encourage optimal usage of Threads		tuning (not increasing)
+
+	i) effective utilization of resources
+	ii) simultaneous / asynchronous execution
+
+
+disadvantages of multi threading:
+	i) race condition		(un predictable)
+	ii) lock starvation		(because of low priority , some threads wait for other threads)
+display1();		//until this method gets over, the next method will not start at all
+display2();
+
+
+
+but if we call display1() using a separate thread,
+even if display1 is not completed,
+
+the main thread will continue to call display2() asynchronous
+
+By learning Multi-Threading, 
+	we learn asynchronous programming
+
+in multi threading, we learn to create child threads
+
+Child threads work independently / parallely / simultaneously
+
+But if the main thread ends, (any thread dies after completing the task) the child threads also will die
+
+
+strategies
+	concurrency
+	parallelism		(mainframes)	multi-core processor
+
+How to create child threads?
+
+i) create an object of Thread class
+	Thread t1=new Thread();		// t1 is a child thread
+	t1.setName("one");		// name of the thread
+	t1.start();			// starts the thread
+	
+what does it means to start a thread?
+	There should be some task defined for the thread.	
+	the task is defined using run() method
+
+Thread is a predefined class and it has run method. we cannot modify existing class THread
+
+	so let us create a sub class for Thread
+
+	class MyThread extends Thread
+	{
+		@Override
+		public void run()
+		{
+			// define the task to be performed
+		}
+	}
+
+
+run()	is a overriding method. The overriding method cannot throw additional exceptions. So "throws" is not allowed in overriding method
+
+
+1) we learnt to create a class that extends Thread and override run()
+2) we can also create a class that extends Runnable and implement run()
+	but a class that implements runnable is not a Thread.
+	so we need to create an object of Thread class and supply the object of RUnnable implementation to the constructor
+
+
+Runnable is an interface. But what kind of interface???
+	Functional Interface	(only 1 abstract method)
+
+
+
+------------------------------------
+package model;
+
+class MyThread extends Thread
+{
+
+	@Override
+	public void run() {
+		for(int i=0;i<20;i++)
+		{
+			System.out.println(i);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				
+			}
+		}
+	}
+	
+}
+
+public class Main_Thread1 {
+
+	public static void main(String[] args) {
+		MyThread t1=new MyThread();
+		t1.start();
+		for(int i=1000;i>0;i--)
+		{
+			System.out.println(i);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				
+			}
+		}
+	}
+
+}
+
+---------------------------------
+package model;
+
+class YourThread implements Runnable
+{
+	public void run()
+	{
+		for(int i=100;i<200;i+=2)
+		{
+			System.out.println(i);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+public class Main_Thread2 {
+
+	public static void main(String[] args) {
+		Thread t1=new Thread(new YourThread());
+		t1.start();
+		for(int i=0;i<100;i++)
+		{
+			System.out.println(i);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				
+			}
+		}
+	}
+
+}
+
+-------------------------------------
+package model;
+
+public class MainThread3 {
+
+	public static void main(String[] args) {
+		Thread t2=new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				for(int i=500;i>0;i--)
+				{
+					System.out.println(i);
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+			}
+		});
+		
+		t2.start();
+			
+			Thread t1=new Thread(()-> {
+				for(int i=1000;i>0;i--)
+				{
+					System.out.println(i);
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						
+					}
+				}
+			});
+			t1.start();
+			
+			for(int i=0;i<20;i++)
+			{
+				System.out.println(i);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					
+				}
+			}
+	}
+
+}
+
+--------------------------------------------------------------
+1) implements Runnable
+	reason 1:	When a class extends JFrame, that class cannot extend another class
+			So better implement Runnable
+	my point:	If we need 3 child threads, we definitely need to create 3 classes
+			and when we create a class specialy for Thread, why we are going to extend some other class?
+			So extends Thread is simple.
+			If we implement Runnable also, we have to create an object of Thread for sure. If our class itself is a sub class of Thread, then it is done in 1 step
+
+	But if we need only 1 child thread, then definitely Runnable is better, because, we dont need to introduce a new class.	
+	Now, we are allowed to use lambda, or anonymous inner type, there, we can create
+	an implementation of Runnable. So runnable wins
+
+2) extends Thread
+-----------------------------------------------------------------------------
+TasK
+	Write a java program that will execute the below methods in asynchronous manner.
+	i) display1()
+		display all odd numbers between 1 and 20
+	ii) display2()
+		display all even numbers between 2 and 20
+
+	While running the program, both should run asynchronously in 1 second delay inside the loop.
+
+package model;
+
+class Odd extends Thread
+{
+	public void run()
+	{
+		for(int i=1;i<=20;i+=2)
+		{
+			System.out.println(i);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+}
+
+class Even implements Runnable
+{
+	public void run()
+	{
+		for(int i=2;i<=20;i+=2)
+		{
+			System.out.println(i);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+public class Task1 {
+
+	public static void main(String[] args) {
+		//Odd extend Thread
+		Odd t1=new Odd();
+		t1.start();
+		
+		//Even implements Runnable
+		Thread t2=new Thread(new Even());
+		t2.start();
+		
+	}
+
+}
+---------------------
+
+Learn to use name of the Thread to identify the thread
+We create one sub class for thread. But several instance of that same sub class
+
+class Thread2 extends Thread
+{
+	int no=500;
+	
+	public void run()
+	{
+		for(int i=no;i>0;i--)
+		{
+			
+		}
+	}
+}
+
+//here, no is a dependency for Thread2 class
+	we can inject dependency via
+		constructor
+		setter
+
+
+
+		t1.start();
+		t2.start();
+		t2.join(); 				//join() makes any new thread trying to start TO WAIT until all started threads complete
+		t3.start();
+
+
+join() is a synchronization method
+
+Thread synchronization is a process to ensure that no 2 threads access a shared resource at a time
+
+a program can have suppose 100 lines of code
+	until 50th line, there is no restriction. If multiple threads are calling this code,
+	they are performing parallely
+
+	but 51 to 60 can be a sensitive area, where only 1 thread can enter.
+	This area of code is called as synchronized block
+
+	sometimes the entire method can be made synchronized
+
+lets see synchronized block first
+
+If 2 threads try to access same object (same code), then sync block will prevent one from entering until the other exit
+
+if 2 threads try to access different objects, then there is no sync at all
+
+
+synchronized (this) {
+
+}
+
+
+
+
+
+TasK:
+
+1) create a class called "Maths"
+	method:		display()
+
+	in display, write 2 for loops
+			"displaying 20 even numbers async"
+		one loop will print 20 even numbers
+			...."displaying 20 odd numbers sync"
+		another loop will print 20 odd numbers
+	Note: displaying message should be 
+		Thread.currentThread.getName()+"\t"+i
+
+		put that odd number loop inside synchronized block
+		
+
+2) Create a class "MathsThread" extends Thread
+	in run method
+		we need to call the display method of Maths. So
+	create a constructor based dependency injection 
+		constructor accepts "Maths" object and stored as an instance variable
+
+	using that object only, run method calls the display method
+
+3) In main method,
+	Create ONE object of "Maths"
+	Create 2 objects of MathsThread (set names as one and two)
+	and inject "Maths" object into both the thread constructors
+
+4) Start both the threads.
+
+	Note: This is before you implement synchronized block
